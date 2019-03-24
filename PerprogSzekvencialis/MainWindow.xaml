@@ -1,0 +1,24 @@
+﻿<Window x:Class="PerprogSzekvencialis.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PerprogSzekvencialis"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="inputButton" Content="Open file input" HorizontalAlignment="Left" Margin="10,22,0,0" VerticalAlignment="Top" Width="130" Height="55" Click="InputButton_Click"/>
+        <Button x:Name="outputButton" Content="Select output file" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="130" Height="55" Click="OutputButton_Click"/>
+        <TextBox x:Name="inputFileText" HorizontalAlignment="Left" Height="53" Margin="145,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="639"/>
+        <TextBox x:Name="outputFileText" HorizontalAlignment="Left" Height="53" Margin="145,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="639"/>
+        <RadioButton x:Name="serial" Content="Serial process" HorizontalAlignment="Left" Margin="27,178,0,0" VerticalAlignment="Top" GroupName="method" IsChecked="True"/>
+        <RadioButton x:Name="parallel" Content="Parallel process" HorizontalAlignment="Left" Margin="27,210,0,0" VerticalAlignment="Top" GroupName="method"/>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="46" Margin="10,332,0,0" VerticalAlignment="Top" Width="774"/>
+        <Label x:Name="messageText" Content="Not started" HorizontalAlignment="Left" Margin="27,246,0,0" VerticalAlignment="Top" Height="62" Width="757"/>
+        <Button x:Name="startProcessButton" Content="Start process" HorizontalAlignment="Left" Margin="301,173,0,0" VerticalAlignment="Top" Width="130" Height="55" Click="StartProcessButton_Click"/>
+        <Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="484,173,0,0" VerticalAlignment="Top" Width="130" Height="55" Click="CancelButton_Click"/>
+        <RadioButton x:Name="encrypt" Content="Encrypt" HorizontalAlignment="Left" Margin="183,178,0,0" VerticalAlignment="Top" GroupName="type" IsChecked="True"/>
+        <RadioButton x:Name="encrypt_Copy" Content="Decrypt" HorizontalAlignment="Left" Margin="183,210,0,0" VerticalAlignment="Top" GroupName="type"/>
+
+    </Grid>
+</Window>
