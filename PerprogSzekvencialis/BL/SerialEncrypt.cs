@@ -28,7 +28,7 @@ namespace PerprogSzekvencialis.BL
             {
                 long allBytes = fi.Length;
                 long round = 0;
-                int byteToProcessLengthDefault = 3145728*10;
+                int byteToProcessLengthDefault = 3145728;
                 byte[] byteToProcess = new byte[byteToProcessLengthDefault]; //3MB*15
                 int read = 0;
                 while (((read = fi.Read(byteToProcess, 0, byteToProcess.Length)) > 0) && !cancellationToken.IsCancellationRequested) 

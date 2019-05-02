@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,16 +15,16 @@ namespace PerprogSzekvencialis.BL
         SemaphoreSlim semaphoreSlim;
         Object lockObject;
         Object lockObjectForList;
-        List<string> readyList;
+        ConcurrentBag<string> readyList;
 
         public ParallelEncrypt(string inputFile, string outputFile, CancellationToken cancellationToken, string key, ProcessType processType, int maxNumberOfTasks) 
             : base(inputFile, outputFile, cancellationToken, key, processType)
         {
             this.maxNumberOfTasks = maxNumberOfTasks;
-            this.semaphoreSlim = new SemaphoreSlim(this.maxNumberOfTasks-1);
+            this.semaphoreSlim = new SemaphoreSlim(this.maxNumberOfTasks);
             this.lockObject = new object();
             this.lockObjectForList = new object();
-            this.readyList = new List<string>();
+            this.readyList = new ConcurrentBag<string>();
         }
 
         public override void Start()
@@ -42,7 +43,7 @@ namespace PerprogSzekvencialis.BL
             this.baseTime = DateTime.Now;
             MessageChangeMethod("Initializing...");
             long lenghtOfFile = 0;
-            int bufferSize = 3145728*10; //3MB*10
+            int bufferSize = 3145728; //3MB*10
             int round = 0;
             using (var fileo = File.OpenRead(this.inputFile))
             {
@@ -94,6 +95,7 @@ namespace PerprogSzekvencialis.BL
             if (!cancellationToken.IsCancellationRequested)
             {
                 MessageChangeMethod(roundNumber + ". round process started...");
+                Console.WriteLine(roundNumber + " is running");
                 byte[] process = new byte[bufferSize];
                 int read = 0;
                 lock (lockObject)
@@ -137,40 +139,66 @@ namespace PerprogSzekvencialis.BL
                 }
 
                 //put the list to tell the other task that it can process this file
-                lock (this.lockObjectForList)
-                {
+               // lock (this.lockObjectForList)
+                //{
                     this.readyList.Add(name);
-                }
+               // }
             }
             semaphoreSlim.Release();
         }
         private void AppendToOutputFileWhenRead(string outpputFile, int maxRounds)
         {
-            this.semaphoreSlim.Wait();
+          //  this.semaphoreSlim.Wait();
             int nextToAppend = 0;
             while (nextToAppend < maxRounds && !cancellationToken.IsCancellationRequested)
             {
-                lock(this.lockObjectForList)
+                // lock(this.lockObjectForList)
+                // {
+
+                List<string> actualListToProcess = new List<string>();
+                foreach (var item in this.readyList)
                 {
-                    foreach (var item in this.readyList)
-                    {
-                        if (item == outpputFile+nextToAppend.ToString())
-                        {
-                            MessageChangeMethod(nextToAppend + ". round WRITING to file...");
-                            Append(item, outpputFile);
-                            nextToAppend++;
-                            PercentageChangedMethod((double)nextToAppend/((double)((maxRounds - 1) / 100.0)));
-                            
-                        }
-                    }
+                    actualListToProcess.Add(item);
                 }
+
+                Console.WriteLine(this.semaphoreSlim.CurrentCount);
+
+               while (actualListToProcess.Contains(outpputFile+nextToAppend.ToString()))
+                {
+                    MessageChangeMethod(nextToAppend + ". round WRITING to file...");
+                    Append(outpputFile + nextToAppend.ToString(), outpputFile);
+                    nextToAppend++;
+                    PercentageChangedMethod((double)nextToAppend / ((double)((maxRounds - 1) / 100.0)));
+                }
+
+                //foreach (var item in actualListToProcess)
+                //{
+                //    string act;
+                //    this.readyList.TryTake(out act);
+                //}
+                if (maxRounds > 100)
+              {
+                    Thread.Sleep(5000);
+              }
+                    //foreach (var item in this.readyList)
+                    //{
+                    //    if (item == outpputFile+nextToAppend.ToString())
+                    //    {
+                    //        MessageChangeMethod(nextToAppend + ". round WRITING to file...");
+                    //        Append(item, outpputFile);
+                    //        nextToAppend++;
+                    //        PercentageChangedMethod((double)nextToAppend/((double)((maxRounds - 1) / 100.0)));
+                            
+                    //    }
+                    //}
+              //  }
 
                 //Thread.Sleep(1000);
 
             }
             MessageChangeMethod("Complete.");
             PercentageChangedMethod(100);
-            this.semaphoreSlim.Release();
+          //  this.semaphoreSlim.Release();
         }
 
         private void Append(string item, string outpputFile)

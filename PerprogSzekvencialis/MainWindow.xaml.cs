@@ -60,7 +60,7 @@ namespace PerprogSzekvencialis
             Encryption s;
             if (parallel.IsChecked == true)
             {
-                s = new ParallelEncrypt(inputFileText.Text, outputFileText.Text, cancellationTokenSource.Token, "123456777", encrypt.IsChecked == true ? ProcessType.Encrypt : ProcessType.Decrypt, 8);
+                s = new ParallelEncrypt(inputFileText.Text, outputFileText.Text, cancellationTokenSource.Token, "123456777", encrypt.IsChecked == true ? ProcessType.Encrypt : ProcessType.Decrypt, 4);
 
             }
             else
@@ -86,7 +86,8 @@ namespace PerprogSzekvencialis
             Dispatcher.Invoke(() =>
             {
                 progressBar.Maximum = 100;
-                progressBar.Value = percent;
+               
+                progressBar.Value = double.IsInfinity(percent) ? 100 :  percent;
             });
         }
     }
